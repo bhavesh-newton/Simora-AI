@@ -13,6 +13,7 @@ const VideoUploader = () => {
   const [srtContent, setSrtContent] = useState(null);
   const [isGeneratingCaptions, setIsGeneratingCaptions] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [useHinglishModel, setUseHinglishModel] = useState(true); // Default to Hinglish model
   const fileInputRef = useRef(null);
   const ffmpegRef = useRef(new FFmpeg());
 
@@ -54,7 +55,9 @@ const VideoUploader = () => {
       const formData = new FormData();
       formData.append('audio', audioBlob, 'extracted_audio.mp3');
 
-      const response = await fetch(`${API_BASE_URL}/upload-audio`, {
+      // Use Hinglish endpoint by default, fallback to regular if needed
+      const endpoint = useHinglishModel ? '/upload-audio-hinglish' : '/upload-audio';
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         body: formData,
       });
@@ -221,17 +224,41 @@ const VideoUploader = () => {
           </div>
 
           {selectedFile && (
-            <div className="actions">
-              <button
-                onClick={extractAudio}
-                disabled={isLoading || isGeneratingCaptions}
-                className="extract-btn"
-              >
-                {isLoading ? `Extracting Audio... ${progress}%` : 
-                 isGeneratingCaptions ? 'Generating Captions...' : 
-                 'Extract Audio & Generate Captions'}
-              </button>
-            </div>
+            <>
+              <div className="model-selection">
+                <div className="model-toggle">
+                  <label className="toggle-label">
+                    <input
+                      type="checkbox"
+                      checked={useHinglishModel}
+                      onChange={(e) => setUseHinglishModel(e.target.checked)}
+                      className="toggle-input"
+                    />
+                    <span className="toggle-slider"></span>
+                    <span className="toggle-text">
+                      {useHinglishModel ? '🇮🇳 Hinglish Model' : '🌐 Multilingual Model'}
+                    </span>
+                  </label>
+                  <p className="model-description">
+                    {useHinglishModel 
+                      ? 'Optimized for Hindi + English mixed content' 
+                      : 'Works with all languages including Hinglish'}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="actions">
+                <button
+                  onClick={extractAudio}
+                  disabled={isLoading || isGeneratingCaptions}
+                  className="extract-btn"
+                >
+                  {isLoading ? `Extracting Audio... ${progress}%` : 
+                   isGeneratingCaptions ? 'Generating Captions...' : 
+                   'Extract Audio & Generate Captions'}
+                </button>
+              </div>
+            </>
           )}
 
           {(isLoading || isGeneratingCaptions) && (

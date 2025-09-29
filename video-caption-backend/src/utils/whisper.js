@@ -88,7 +88,7 @@ async function processAudioWithWhisper(audioFilePath, model = 'base') {
  * Alternative implementation using whisper with simpler JSON output
  * Uses multilingual model for better support of mixed languages
  */
-async function processAudioWithWhisperSimple(audioFilePath, model = 'small') {
+async function processAudioWithWhisperSimple(audioFilePath, model = 'large') {
   return new Promise((resolve, reject) => {
     console.log(`🎙️ Starting Whisper transcription with multilingual model: ${model}`);
     
@@ -96,14 +96,16 @@ async function processAudioWithWhisperSimple(audioFilePath, model = 'small') {
     const baseName = path.basename(audioFilePath, path.extname(audioFilePath));
     
     // Use whisper CLI with SRT output - multilingual model for better language detection
-    // Small model provides good multilingual support while being faster than medium/large models
+    // Large model provides the best multilingual support and accuracy for Hinglish content
+    // Omitting --language parameter allows automatic language detection (default behavior)
     const whisperArgs = [
       audioFilePath,
       '--model', model,
       '--output_dir', outputDir,
       '--output_format', 'srt',
       '--verbose', 'False',  // Reduce verbose output
-      '--task', 'transcribe'  // Explicitly set task to transcribe (not translate)
+      '--task', 'transcribe',  // Explicitly set task to transcribe (not translate)
+      '--temperature', '0.0'  // Lower temperature for more consistent results
     ];
 
     console.log('🔧 Whisper command:', 'whisper', whisperArgs.join(' '));
@@ -206,7 +208,89 @@ function srtTimeToSeconds(timeStr) {
   return hours * 3600 + minutes * 60 + seconds + parseInt(ms) / 1000;
 }
 
+/**
+ * Process audio using specialized Hinglish Whisper model
+ * @param {string} audioFilePath - Path to the audio file
+ * @param {string} model - Hugging Face model identifier for Hinglish
+ * @returns {Promise<Array>} - Array of transcription segments
+ */
+async function processAudioWithHinglishWhisper(audioFilePath, model = 'Oriserve/Whisper-Hindi2Hinglish-Swift') {
+  return new Promise((resolve, reject) => {
+    console.log(`🎙️ Starting Hinglish Whisper transcription with model: ${model}`);
+    
+    const outputDir = path.dirname(audioFilePath);
+    const baseName = path.basename(audioFilePath, path.extname(audioFilePath));
+    const outputFile = path.join(outputDir, `${baseName}_hinglish.json`);
+    
+    const pythonScript = path.join(__dirname, 'hinglish_whisper.py');
+    
+    // Use the specialized Hinglish Python script
+    const pythonArgs = [
+      pythonScript,
+      audioFilePath,
+      '--model', model,
+      '--output', outputFile
+    ];
+
+    console.log('🔧 Hinglish Whisper command:', 'python3', pythonArgs.join(' '));
+
+    const pythonProcess = spawn('/Users/bhavesh-appbrew/Desktop/Simora AI/.venv/bin/python', pythonArgs, {
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+
+    let stderr = '';
+
+    pythonProcess.stdout.on('data', (data) => {
+      console.log('Hinglish Whisper output:', data.toString().trim());
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
+      stderr += data.toString();
+      console.log('Hinglish Whisper:', data.toString().trim());
+    });
+
+    pythonProcess.on('close', (code) => {
+      if (code !== 0) {
+        console.error('Hinglish Whisper process failed with code:', code);
+        console.error('Error output:', stderr);
+        
+        if (stderr.includes('SSL') || stderr.includes('certificate')) {
+          return reject(new Error(`Hinglish model download failed due to SSL/network issues. Please check your internet connection.`));
+        }
+        
+        return reject(new Error(`Hinglish Whisper transcription failed: ${stderr}`));
+      }
+
+      try {
+        // Read the JSON output file
+        if (!fs.existsSync(outputFile)) {
+          return reject(new Error('Hinglish transcription output file not found'));
+        }
+
+        const transcriptionData = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
+        
+        console.log(`✅ Hinglish transcription completed with ${transcriptionData.segments?.length || 0} segments`);
+        
+        // Clean up the output file
+        fs.unlinkSync(outputFile);
+        
+        resolve(transcriptionData.segments || []);
+        
+      } catch (error) {
+        console.error('Error parsing Hinglish transcription results:', error);
+        reject(new Error(`Failed to parse Hinglish transcription results: ${error.message}`));
+      }
+    });
+
+    pythonProcess.on('error', (error) => {
+      console.error('Failed to start Hinglish Python process:', error);
+      reject(new Error(`Failed to start Hinglish transcription: ${error.message}`));
+    });
+  });
+}
+
 module.exports = {
   processAudioWithWhisper: processAudioWithWhisperSimple,
+  processAudioWithHinglishWhisper,
   processAudioWithWhisperSimple
 };
