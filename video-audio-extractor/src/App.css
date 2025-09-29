@@ -623,3 +623,362 @@ body {
     font-size: 0.8rem;
   }
 }
+
+/* Remotion Video Player Styles */
+.remotion-video-player {
+  background: #1a1a1a;
+  border-radius: 16px;
+  padding: 24px;
+  color: white;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.player-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #333;
+}
+
+.player-header h3 {
+  color: #fff;
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.font-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.font-selector label {
+  color: #ccc;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.font-dropdown {
+  background: #333;
+  border: 1px solid #555;
+  border-radius: 8px;
+  color: white;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.font-dropdown:hover {
+  border-color: #667eea;
+}
+
+.font-dropdown:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.player-wrapper {
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  background: #000;
+}
+
+.remotion-video {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 500px;
+  object-fit: contain;
+}
+
+.video-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  background: #111;
+  color: #ccc;
+  font-size: 1.1rem;
+}
+
+/* Remotion-style Caption Overlay */
+.remotion-caption-overlay {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(6px);
+  border-radius: 12px;
+  padding: 8px 16px;
+  max-width: 70%;
+  text-align: center;
+  z-index: 10;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.caption-text {
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.3;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9);
+  word-wrap: break-word;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px;
+}
+
+/* Word Highlighting Animation */
+.caption-word {
+  transition: all 0.3s ease;
+  display: inline-block;
+  padding: 2px 1px;
+  border-radius: 3px;
+}
+
+.caption-word.highlighted {
+  color: #FFD700;
+  font-weight: 600;
+  text-shadow: 
+    0 0 5px rgba(255, 215, 0, 0.5),
+    1px 1px 3px rgba(0, 0, 0, 0.9);
+  transform: scale(1.05);
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.caption-word.unhighlighted {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+}
+
+/* Smooth highlight transition effect */
+.caption-word.highlighted::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #FFD700, #FFA500);
+  border-radius: 1px;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+/* Remotion-style Controls */
+.remotion-controls {
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
+  padding: 16px 20px;
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.play-pause-btn {
+  background: #667eea;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+.play-pause-btn:hover {
+  background: #5a67d8;
+  transform: scale(1.05);
+}
+
+.time-display {
+  color: #ccc;
+  font-size: 0.9rem;
+  font-weight: 500;
+  min-width: 80px;
+  font-family: 'SF Mono', Monaco, monospace;
+}
+
+.progress-container {
+  flex: 1;
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+.progress-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #667eea;
+  border-radius: 2px;
+  transition: width 0.1s ease;
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.volume-value {
+  font-family: 'SF Mono', Monaco, monospace;
+  min-width: 35px;
+}
+
+/* Player Info Section */
+.player-info {
+  margin-top: 20px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-label {
+  color: #888;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Font Family Specific Styles */
+.remotion-caption-overlay[style*="font-family: Inter"] {
+  font-weight: 500;
+}
+
+.remotion-caption-overlay[style*="font-family: Arial"] {
+  font-weight: 600;
+}
+
+.remotion-caption-overlay[style*="font-family: Georgia"] {
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Responsive Design for Remotion Player */
+@media (max-width: 768px) {
+  .remotion-video-player {
+    padding: 16px;
+  }
+  
+  .player-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .font-selector {
+    justify-content: space-between;
+  }
+  
+  .control-row {
+    gap: 12px;
+  }
+  
+  .time-display {
+    font-size: 0.8rem;
+    min-width: 70px;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .remotion-caption-overlay {
+    bottom: 60px;
+    max-width: 85%;
+    padding: 6px 12px;
+  }
+  
+  .caption-text {
+    font-size: 0.85rem;
+    line-height: 1.2;
+  }
+  
+  .caption-word {
+    padding: 1px;
+  }
+  
+  .caption-word.highlighted {
+    transform: scale(1.02);
+  }
+}
+
+@media (max-width: 480px) {
+  .play-pause-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+  }
+  
+  .remotion-controls {
+    padding: 12px 16px;
+  }
+  
+  .control-row {
+    gap: 10px;
+  }
+  
+  .time-display {
+    font-size: 0.75rem;
+    min-width: 60px;
+  }
+}
